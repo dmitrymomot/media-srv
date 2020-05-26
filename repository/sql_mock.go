@@ -84,11 +84,11 @@ func CreateResizedItemMock(mock sqlmock.Sqlmock, arg CreateResizedItemParams, ex
 func GetResizedItemByIDMock(mock sqlmock.Sqlmock, arg ResizedItem, expectedErr error) {
 	if expectedErr != nil {
 		mock.ExpectQuery(getResizedItemByID).
-			WithArgs(arg.OID).
+			WithArgs(arg.ID).
 			WillReturnError(expectedErr)
 	} else {
 		mock.ExpectQuery(getResizedItemByID).
-			WithArgs(arg.OID).
+			WithArgs(arg.ID).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"id", "oid", "name", "path", "url", "width", "height", "created_at"}).
 					AddRow(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height, arg.CreatedAt),
