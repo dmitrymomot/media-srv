@@ -10,12 +10,10 @@ import (
 	"reflect"
 	"testing"
 
-	"gotest.tools/assert"
-
 	"github.com/dmitrymomot/media-srv/repository"
 	"github.com/dmitrymomot/media-srv/resizer"
 	"github.com/dmitrymomot/media-srv/storage"
-	"github.com/go-chi/render"
+	"gotest.tools/assert"
 )
 
 func TestValidationError_Add(t *testing.T) {
@@ -142,8 +140,7 @@ func TestWrap_ServeHTTP(t *testing.T) {
 		wantErr bool
 	}{
 		{"success", Wrap(func(w http.ResponseWriter, r *http.Request) error {
-			render.PlainText(w, r, "test")
-			return nil
+			return stringResponse(w, http.StatusOK, "test")
 		}), args{httptest.NewRecorder(), r}, http.StatusOK, "test", false},
 
 		{"validation error", Wrap(func(w http.ResponseWriter, r *http.Request) error {
@@ -158,7 +155,11 @@ func TestWrap_ServeHTTP(t *testing.T) {
 
 		{"undefined error", Wrap(func(w http.ResponseWriter, r *http.Request) error {
 			return errors.New("error")
-		}), args{httptest.NewRecorder(), r}, http.StatusInternalServerError, "{\"error\":\"error\"}\n", true},
+		}), args{httptest.NewRecorder(), r}, http.StatusInternalServerError, "{\"error\":\"Internal Server Error\"}\n", true},
+
+		{"ont founnd error", Wrap(func(w http.ResponseWriter, r *http.Request) error {
+			return sql.ErrNoRows
+		}), args{httptest.NewRecorder(), r}, http.StatusNotFound, "{\"error\":\"Not Found\"}\n", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

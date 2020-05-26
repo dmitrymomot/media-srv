@@ -10,7 +10,6 @@ import (
 
 	"github.com/dmitrymomot/media-srv/repository"
 	"github.com/dmitrymomot/media-srv/storage"
-	"github.com/go-chi/render"
 	"github.com/pkg/errors"
 )
 
@@ -79,19 +78,22 @@ func (e HTTPError) Error() string {
 // ServeHTTP func is http.Handler interface implementation
 func (h Wrap) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := h(w, r); err != nil {
-		// log.Fatalf("%+v", w)
 		switch err.(type) {
 		case *ValidationError:
 			er := err.(*ValidationError)
-			jsonResponse(w, http.StatusUnprocessableEntity, render.M{"validationError": er.GetAll()})
+			jsonResponse(w, http.StatusUnprocessableEntity, data{"validationError": er.GetAll()})
 			return
 		case HTTPError:
 			er := err.(HTTPError)
-			jsonResponse(w, er.Code, render.M{"error": er.Message})
+			jsonResponse(w, er.Code, data{"error": er.Message})
 			return
 		default:
+			if errors.Is(err, sql.ErrNoRows) {
+				jsonResponse(w, http.StatusNotFound, data{"error": http.StatusText(http.StatusNotFound)})
+				return
+			}
 			log.Println(errors.Wrap(err, "undefined http error"))
-			jsonResponse(w, http.StatusInternalServerError, render.M{"error": err.Error()})
+			jsonResponse(w, http.StatusInternalServerError, data{"error": http.StatusText(http.StatusInternalServerError)})
 			return
 		}
 	}
