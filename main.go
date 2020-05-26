@@ -1,8 +1,22 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 
+	_ "github.com/lib/pq" // init pg driver
+
+	"github.com/TV4/graceful"
+	"github.com/dmitrymomot/media-srv/repository"
+	"github.com/dmitrymomot/media-srv/storage"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
 )
 
@@ -17,5 +31,81 @@ func init() {
 }
 
 func main() {
+	dbConnStr := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_DATABASE"),
+	)
+	db, err := sql.Open(os.Getenv("DB_DRIVER"), dbConnStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
+	db.SetMaxOpenConns(3)
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := repository.Migrate(db, os.Getenv("DB_DRIVER"), "/migrations"); err != nil {
+		log.Fatal(err)
+	}
+
+	_ = repository.New(db)
+
+	disableSSL, _ := strconv.ParseBool(os.Getenv("STORAGE_DISABLE_SSL"))
+	forcePathStyle, _ := strconv.ParseBool(os.Getenv("STORAGE_FORCE_PATH_STYLE"))
+	opt := storage.Options{
+		Key:            os.Getenv("STORAGE_KEY"),
+		Secret:         os.Getenv("STORAGE_SECRET"),
+		Endpoint:       os.Getenv("STORAGE_ENDPOINT"),
+		Region:         os.Getenv("STORAGE_REGION"),
+		Bucket:         os.Getenv("STORAGE_BUCKET"),
+		URL:            os.Getenv("STORAGE_URL"),
+		DisableSSL:     disableSSL,
+		ForcePathStyle: forcePathStyle,
+	}
+	_ = storage.New(storage.NewS3Client(opt), opt)
+
+	r := chi.NewRouter()
+
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.NotFound(notFoundHandler)
+	r.MethodNotAllowed(methodNotAllowedHandler)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(fmt.Sprintf("build_tag: %s", buildTag)))
+	})
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("."))
+	})
+
+	// r.Mount(fmt.Sprintf("/%s", os.Getenv("API_VERSION")), handler)
+
+	s := &http.Server{
+		Handler: r,
+		Addr:    fmt.Sprintf(":%s", os.Getenv("API_PORT")),
+	}
+	graceful.LogListenAndServe(s)
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(map[string]interface{}{"error": http.StatusText(http.StatusNotFound)})
+}
+
+func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	json.NewEncoder(w).Encode(map[string]interface{}{"error": http.StatusText(http.StatusMethodNotAllowed)})
 }

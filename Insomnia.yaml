@@ -1,6 +1,6 @@
 _type: export
 __export_format: 4
-__export_date: 2020-05-26T20:28:47.637Z
+__export_date: 2020-05-26T23:27:25.446Z
 __export_source: insomnia.desktop.app:v7.1.1
 resources:
   - _id: req_15cba5b06ceb4dd3a347819263658542
@@ -31,6 +31,27 @@ resources:
     name: media-srv
     parentId: null
     _type: workspace
+  - _id: req_752786c5618b469d87a148fe69b099a8
+    authentication: {}
+    body: {}
+    created: 1590535511125
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973174.5
+    method: GET
+    modified: 1590535513852
+    name: build tag
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}"
+    _type: request
   - _id: req_06de2f71d6fc4e7e98f4605ef502bda4
     authentication: {}
     body:
@@ -176,6 +197,30 @@ resources:
     url: "{{ base_url  }}v1/original/{% response 'body',
       'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always'
       %}/resized"
+    _type: request
+  - _id: req_eaaab25fa03a48c9b3cbdbcdd60afe18
+    authentication: {}
+    body: {}
+    created: 1590535555063
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590367849397.375
+    method: GET
+    modified: 1590535611598
+    name: Get resized item by id
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original/{% response 'body',
+      'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always'
+      %}/resized/{% response 'body', 'req_db631c1233dc4ba5980e4d8f5dfb3523',
+      'b64::JC4wLmlk::46b', 'no-history' %}"
     _type: request
   - _id: env_32e543633847f3d3c83815979e754ee938be26c4
     color: null
