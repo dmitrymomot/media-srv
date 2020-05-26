@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dmitrymomot/media-srv/handler"
+	"github.com/dmitrymomot/media-srv/resizer"
+
 	_ "github.com/lib/pq" // init pg driver
 
 	"github.com/TV4/graceful"
@@ -55,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_ = repository.New(db)
+	query := repository.New(db)
 
 	disableSSL, _ := strconv.ParseBool(os.Getenv("STORAGE_DISABLE_SSL"))
 	forcePathStyle, _ := strconv.ParseBool(os.Getenv("STORAGE_FORCE_PATH_STYLE"))
@@ -69,7 +72,9 @@ func main() {
 		DisableSSL:     disableSSL,
 		ForcePathStyle: forcePathStyle,
 	}
-	_ = storage.New(storage.NewS3Client(opt), opt)
+	stor := storage.New(storage.NewS3Client(opt), opt)
+
+	h := handler.New(db, query, stor, resizer.Resize)
 
 	r := chi.NewRouter()
 
@@ -89,7 +94,7 @@ func main() {
 		w.Write([]byte("."))
 	})
 
-	// r.Mount(fmt.Sprintf("/%s", os.Getenv("API_VERSION")), handler)
+	r.Mount(fmt.Sprintf("/%s", os.Getenv("API_VERSION")), handler.Router(h))
 
 	s := &http.Server{
 		Handler: r,
