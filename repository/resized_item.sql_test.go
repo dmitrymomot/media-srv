@@ -127,7 +127,7 @@ func TestQueries_GetResizedItemByID(t *testing.T) {
 		args    args
 		want    ResizedItem
 		wantErr bool
-	}{"success", fields{db}, args{context.TODO(), item.OID}, item, false}
+	}{"success", fields{db}, args{context.TODO(), item.ID}, item, false}
 	t.Run(tt.name, func(t *testing.T) {
 		q := &Queries{
 			db: tt.fields.db,
