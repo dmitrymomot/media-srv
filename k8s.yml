@@ -1,0 +1,53 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: media-srv
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: media-srv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media-srv
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        config.linkerd.io/skip-outbound-ports: "4222,5432,6379"
+        linkerd.io/inject: enabled
+      creationTimestamp: null
+      labels:
+        app: media-srv
+    spec:
+      serviceAccountName: media-srv
+      containers:
+        - name: media-srv
+          image: media-srv:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-srv
+spec:
+  type: LoadBalancer
+  selector:
+    app: media-srv
+  ports:
+    - name: http-lb
+      port: 8080
+      targetPort: 8080
