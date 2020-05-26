@@ -43,6 +43,11 @@ func NewHTTPError(code int, msg interface{}) error {
 	return HTTPError{Code: code, Message: msg}
 }
 
+// NewValidationError factory
+func NewValidationError(errs url.Values) *ValidationError {
+	return &ValidationError{errBag: errs}
+}
+
 // Add validation errors to errors bag
 func (e *ValidationError) Add(key string, vals []string) {
 	if e.errBag == nil {
