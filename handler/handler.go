@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -87,15 +86,13 @@ func (h Wrap) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			er := err.(HTTPError)
 			jsonResponse(w, er.Code, data{"error": er.Message})
 			return
-		default:
-			if errors.Is(err, sql.ErrNoRows) {
-				jsonResponse(w, http.StatusNotFound, data{"error": http.StatusText(http.StatusNotFound)})
-				return
-			}
-			log.Println(errors.Wrap(err, "undefined http error"))
-			jsonResponse(w, http.StatusInternalServerError, data{"error": http.StatusText(http.StatusInternalServerError)})
+		}
+		if errors.Is(err, sql.ErrNoRows) {
+			jsonResponse(w, http.StatusNotFound, data{"error": http.StatusText(http.StatusNotFound)})
 			return
 		}
+		jsonResponse(w, http.StatusInternalServerError, data{"error": http.StatusText(http.StatusInternalServerError)})
+		return
 	}
 }
 
