@@ -1,0 +1,298 @@
+_type: export
+__export_format: 4
+__export_date: 2020-05-27T00:16:44.907Z
+__export_source: insomnia.desktop.app:v7.1.1
+resources:
+  - _id: req_15cba5b06ceb4dd3a347819263658542
+    authentication: {}
+    body: {}
+    created: 1590429939232
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973187
+    method: GET
+    modified: 1590433119134
+    name: healthcheck
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}health"
+    _type: request
+  - _id: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    created: 1590429876740
+    description: ""
+    modified: 1590429876740
+    name: media-srv
+    parentId: null
+    _type: workspace
+  - _id: req_752786c5618b469d87a148fe69b099a8
+    authentication: {}
+    body: {}
+    created: 1590535511125
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973174.5
+    method: GET
+    modified: 1590535513852
+    name: build tag
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}"
+    _type: request
+  - _id: req_b4ee9b10180746c3aa0bf8bd04fc01b7
+    authentication: {}
+    body: {}
+    created: 1590536294488
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973168.25
+    method: GET
+    modified: 1590536304191
+    name: not found
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}/not-found-url"
+    _type: request
+  - _id: req_5d21b32e54a34e568acce6efc6067364
+    authentication: {}
+    body: {}
+    created: 1590536329486
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973165.125
+    method: POST
+    modified: 1590536338710
+    name: method not allowed
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}"
+    _type: request
+  - _id: req_06de2f71d6fc4e7e98f4605ef502bda4
+    authentication: {}
+    body:
+      mimeType: multipart/form-data
+      params:
+        - description: ""
+          fileName: /Users/dmitrymomot/Dropbox/Pictures/MachineLearningAlgorithms.png
+          id: pair_521b3f46a7044442843514f26db20ea4
+          name: image
+          type: file
+          value: ""
+        - description: ""
+          id: pair_4e1da1b27de344b6ae595b713eaa6950
+          name: width
+          value: "124"
+        - description: ""
+          id: pair_117bdaa717914c4ca4de151e8d02e908
+          name: height
+          value: "124"
+    created: 1590430041081
+    description: ""
+    headers:
+      - id: pair_8912b49bd58e4fb2a853b8eddcbc2820
+        name: Content-Type
+        value: multipart/form-data
+    isPrivate: false
+    metaSortKey: -1590429973162
+    method: POST
+    modified: 1590433122684
+    name: Upload new file
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original"
+    _type: request
+  - _id: req_0e62c44a3fce40e6ab24d8390faed557
+    authentication: {}
+    body: {}
+    created: 1590429973137
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973155.75
+    method: GET
+    modified: 1590538483016
+    name: Get original items list
+    parameters:
+      - description: ""
+        id: pair_2e7b671b5362416ebd951c54bb003b23
+        name: limit
+        value: "10"
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original"
+    _type: request
+  - _id: req_27d09c74b3564b679df1908349c740db
+    authentication: {}
+    body: {}
+    created: 1590430015735
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973152.625
+    method: GET
+    modified: 1590538485575
+    name: Get original item by id
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original/{% response 'body',
+      'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always' %}"
+    _type: request
+  - _id: req_db631c1233dc4ba5980e4d8f5dfb3523
+    authentication: {}
+    body: {}
+    created: 1590433188481
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590429973151.0625
+    method: GET
+    modified: 1590538513318
+    name: Get resized items list
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original/{% response 'body',
+      'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always'
+      %}/resized"
+    _type: request
+  - _id: req_cc1bf349221a43e2982c414ffe3693c0
+    authentication: {}
+    body:
+      mimeType: multipart/form-data
+      params:
+        - description: ""
+          id: pair_4e1da1b27de344b6ae595b713eaa6950
+          name: width
+          value: "512"
+        - description: ""
+          id: pair_117bdaa717914c4ca4de151e8d02e908
+          name: height
+          value: "512"
+    created: 1590433217156
+    description: ""
+    headers:
+      - id: pair_8912b49bd58e4fb2a853b8eddcbc2820
+        name: Content-Type
+        value: multipart/form-data
+    isPrivate: false
+    metaSortKey: -1590429973149.5
+    method: POST
+    modified: 1590538566331
+    name: Resize item
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original/{% response 'body',
+      'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always'
+      %}/resized"
+    _type: request
+  - _id: req_eaaab25fa03a48c9b3cbdbcdd60afe18
+    authentication: {}
+    body: {}
+    created: 1590535555063
+    description: ""
+    headers: []
+    isPrivate: false
+    metaSortKey: -1590367849397.375
+    method: GET
+    modified: 1590535611598
+    name: Get resized item by id
+    parameters: []
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: "{{ base_url  }}v1/original/{% response 'body',
+      'req_0e62c44a3fce40e6ab24d8390faed557', 'b64::JC4wLmlk::46b', 'always'
+      %}/resized/{% response 'body', 'req_db631c1233dc4ba5980e4d8f5dfb3523',
+      'b64::JC4wLmlk::46b', 'no-history' %}"
+    _type: request
+  - _id: env_32e543633847f3d3c83815979e754ee938be26c4
+    color: null
+    created: 1590429876835
+    data: {}
+    dataPropertyOrder: null
+    isPrivate: false
+    metaSortKey: 1590429876835
+    modified: 1590429876835
+    name: Base Environment
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    _type: environment
+  - _id: jar_32e543633847f3d3c83815979e754ee938be26c4
+    cookies: []
+    created: 1590429876837
+    modified: 1590429876837
+    name: Default Jar
+    parentId: wrk_99d2f39a543847aaa9cb6e33fa91632b
+    _type: cookie_jar
+  - _id: env_ff3e2de78002449d88ebe42894a3fca0
+    color: null
+    created: 1590429887370
+    data:
+      base_url: http://localhost:8080/
+    dataPropertyOrder:
+      "&":
+        - base_url
+    isPrivate: false
+    metaSortKey: 1590429887370
+    modified: 1590429916733
+    name: local
+    parentId: env_32e543633847f3d3c83815979e754ee938be26c4
+    _type: environment
