@@ -34,4 +34,4 @@ make downn
 
 
 ## Documentation
-It doesnn't exist, but you can use [Insomnia app]([http](https://insomnia.rest)) config file (grab it from the root of this repo) to see examples of all requests and responses.
+It doesnn't exist, but you can use [Insomnia app](https://insomnia.rest) config file (grab it from the root of this repo) to see examples of all requests and responses.
