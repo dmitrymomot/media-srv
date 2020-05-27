@@ -8,6 +8,7 @@ import (
 	"github.com/dmitrymomot/media-srv/storage"
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/thedevsaddam/govalidator"
 )
 
@@ -28,7 +29,7 @@ func (h *Handler) Resize(w http.ResponseWriter, r *http.Request) error {
 
 	tx, err := h.db.Begin()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "begin transaction")
 	}
 
 	query := h.query.WithTx(tx)
@@ -36,7 +37,7 @@ func (h *Handler) Resize(w http.ResponseWriter, r *http.Request) error {
 	originalItem, err := query.GetOriginalItemByID(r.Context(), oid)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return errors.Wrap(err, "get original item from db")
 	}
 
 	height, _ := strconv.Atoi(r.FormValue("height"))
@@ -54,27 +55,29 @@ func (h *Handler) Resize(w http.ResponseWriter, r *http.Request) error {
 	})
 	if err != nil {
 		tx.Rollback()
-		return err
+		return errors.Wrap(err, "store resized item to db")
 	}
 
-	file, err := h.storage.Download(originalItem.Path)
+	file, ct, err := h.storage.Download(originalItem.Path)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return errors.Wrap(err, "download original image")
 	}
 
 	resizedFile, err := h.resize(file, width, height)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return errors.Wrap(err, "resize image")
 	}
 
-	if err := h.storage.Upload(resizedFile, resizedItem.Path, storage.Public); err != nil {
+	if err := h.storage.Upload(resizedFile, resizedItem.Path, storage.Public, *ct); err != nil {
 		tx.Rollback()
-		return err
+		return errors.Wrap(err, "upload resized image")
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit resized item")
+	}
 
 	return jsonResponse(w, http.StatusOK, data{
 		"original": originalItem,
