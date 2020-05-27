@@ -42,54 +42,31 @@ func TestQueries_CreateResizedItem(t *testing.T) {
 	defer db.Close()
 	CreateResizedItemMock(mock, arg, nil)
 
-	type fields struct {
-		db DBTX
-	}
-	type args struct {
-		ctx context.Context
-		arg CreateResizedItemParams
-	}
-	tt := struct {
-		name    string
-		fields  fields
-		args    args
-		want    ResizedItem
-		wantErr bool
-	}{"success", fields{db}, args{context.TODO(), arg}, item, false}
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateResizedItem(tt.args.ctx, tt.args.arg)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, tt.wantErr)
+		got, err := q.CreateResizedItem(context.TODO(), arg)
+		if err != nil {
+			t.Errorf("Queries.CreateResizedItem() error = %v", err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, tt.want)
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, item)
 		}
 	})
 
 	expErr := errors.New("CreateResizedItem")
 	CreateResizedItemMock(mock, arg, expErr)
-	tt = struct {
-		name    string
-		fields  fields
-		args    args
-		want    ResizedItem
-		wantErr bool
-	}{"error", fields{db}, args{context.TODO(), arg}, ResizedItem{}, true}
-	t.Run(tt.name, func(t *testing.T) {
+
+	t.Run("error", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateResizedItem(tt.args.ctx, tt.args.arg)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, tt.wantErr)
+		_, err := q.CreateResizedItem(context.TODO(), arg)
+		if err == nil {
+			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, expErr)
 			return
-		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, tt.want)
 		}
 	})
 }

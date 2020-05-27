@@ -17,12 +17,10 @@ func NewSQLMock() (*sql.DB, sqlmock.Sqlmock, error) {
 func CreateOriginalItemMock(mock sqlmock.Sqlmock, arg CreateOriginalItemParams, expectedErr error) {
 	if expectedErr != nil {
 		mock.ExpectExec(createOriginalItem).
-			WithArgs(arg.ID, arg.Name, arg.Path, arg.URL).
 			WillReturnError(expectedErr)
 	} else {
 		t, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
 		mock.ExpectQuery(createOriginalItem).
-			WithArgs(arg.ID, arg.Name, arg.Path, arg.URL).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"id", "name", "path", "url", "created_at"}).
 					AddRow(arg.ID, arg.Name, arg.Path, arg.URL, t),
@@ -67,12 +65,11 @@ func GetOriginalItemsListMock(mock sqlmock.Sqlmock, arg GetOriginalItemsListPara
 func CreateResizedItemMock(mock sqlmock.Sqlmock, arg CreateResizedItemParams, expectedErr error) {
 	if expectedErr != nil {
 		mock.ExpectExec(createResizedItem).
-			WithArgs(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height).
 			WillReturnError(expectedErr)
+
 	} else {
 		t, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
 		mock.ExpectQuery(createResizedItem).
-			WithArgs(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"id", "oid", "name", "path", "url", "width", "height", "created_at"}).
 					AddRow(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height, t),

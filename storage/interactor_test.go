@@ -88,7 +88,7 @@ func TestInteractor_Upload(t *testing.T) {
 				url:            tt.fields.url,
 				forcePathStyle: tt.fields.forcePathStyle,
 			}
-			if err := i.Upload(tt.args.file, tt.args.filepath, tt.args.acl); (err != nil) != tt.wantErr {
+			if err := i.Upload(tt.args.file, tt.args.filepath, tt.args.acl, "image/png"); (err != nil) != tt.wantErr {
 				t.Errorf("Interactor.Upload() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -131,7 +131,7 @@ func TestInteractor_Download(t *testing.T) {
 				url:            tt.fields.url,
 				forcePathStyle: tt.fields.forcePathStyle,
 			}
-			got, err := i.Download(tt.args.filepath)
+			got, _, err := i.Download(tt.args.filepath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Interactor.Download() error = %v, wantErr %v", err, tt.wantErr)
 				return

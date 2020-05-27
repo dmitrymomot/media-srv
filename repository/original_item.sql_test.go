@@ -36,52 +36,29 @@ func TestQueries_CreateOriginalItem(t *testing.T) {
 	defer db.Close()
 	CreateOriginalItemMock(mock, arg, nil)
 
-	type fields struct {
-		db DBTX
-	}
-	type args struct {
-		ctx context.Context
-		arg CreateOriginalItemParams
-	}
-	tt := struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"success: create original", fields{db}, args{context.TODO(), arg}, item, false}
-
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("success: create original", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateOriginalItem(tt.args.ctx, tt.args.arg)
+		got, err := q.CreateOriginalItem(context.TODO(), arg)
 		if err != nil {
-			t.Errorf("Queries.CreateOriginalItem() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("Queries.CreateOriginalItem() error = %v", err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateOriginalItem() = %v, want %v", got, tt.want)
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateOriginalItem() = %v, want %v", got, item)
 		}
 	})
 
 	wantErr := errors.New("CreateOriginalItem")
 	CreateOriginalItemMock(mock, arg, wantErr)
-	tt = struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"error: create original", fields{db}, args{context.TODO(), arg}, item, true}
-
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("error: create original", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		_, err := q.CreateOriginalItem(tt.args.ctx, tt.args.arg)
+		_, err := q.CreateOriginalItem(context.TODO(), arg)
 		if err == nil {
-			t.Errorf("Queries.CreateOriginalItem() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("Queries.CreateOriginalItem() error = %v, wanted = %v", err, wantErr)
 			return
 		}
 	})
@@ -103,52 +80,30 @@ func TestQueries_GetOriginalItemByID(t *testing.T) {
 	defer db.Close()
 	GetOriginalItemByIDMock(mock, item, nil)
 
-	type fields struct {
-		db DBTX
-	}
-	type args struct {
-		ctx context.Context
-		id  uuid.UUID
-	}
-	tt := struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"success: get origin by id", fields{db}, args{context.TODO(), item.ID}, item, false}
-
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("success: get origin by id", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.GetOriginalItemByID(tt.args.ctx, tt.args.id)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.GetOriginalItemByID() error = %v, wantErr %v", err, tt.wantErr)
+		got, err := q.GetOriginalItemByID(context.TODO(), item.ID)
+		if err != nil {
+			t.Errorf("Queries.GetOriginalItemByID() error = %v", err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.GetOriginalItemByID() = %v, want %v", got, tt.want)
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.GetOriginalItemByID() = %v, want %v", got, item)
 		}
 	})
 
 	expErr := errors.New("GetOriginalItemByID")
 	GetOriginalItemByIDMock(mock, item, expErr)
-	tt = struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"error: get origin by id", fields{db}, args{context.TODO(), item.ID}, item, true}
 
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("error: get origin by id", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		_, err := q.GetOriginalItemByID(tt.args.ctx, tt.args.id)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.GetOriginalItemByID() error = %v, wantErr %v", err, tt.wantErr)
+		_, err := q.GetOriginalItemByID(context.TODO(), item.ID)
+		if err == nil {
+			t.Errorf("Queries.GetOriginalItemByID() error = %v, wantErr %v", err, expErr)
 			return
 		}
 	})

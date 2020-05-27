@@ -52,12 +52,13 @@ func New(c Client, opt Options) *Interactor {
 }
 
 // Upload file to the cloud storage
-func (i *Interactor) Upload(file io.ReadSeeker, filepath string, acl ACL) error {
+func (i *Interactor) Upload(file io.ReadSeeker, filepath string, acl ACL, contentType string) error {
 	object := s3.PutObjectInput{
-		Bucket: aws.String(i.bucket),
-		Key:    aws.String(filepath),
-		Body:   file,
-		ACL:    aws.String(acl.String()),
+		Bucket:      aws.String(i.bucket),
+		Key:         aws.String(filepath),
+		Body:        file,
+		ACL:         aws.String(acl.String()),
+		ContentType: aws.String(contentType),
 	}
 
 	_, err := i.client.PutObject(&object)
@@ -69,7 +70,7 @@ func (i *Interactor) Upload(file io.ReadSeeker, filepath string, acl ACL) error 
 }
 
 // Download file from the cloud storage
-func (i *Interactor) Download(filepath string) (io.ReadCloser, error) {
+func (i *Interactor) Download(filepath string) (io.ReadCloser, *string, error) {
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(i.bucket),
 		Key:    aws.String(filepath),
@@ -77,10 +78,10 @@ func (i *Interactor) Download(filepath string) (io.ReadCloser, error) {
 
 	result, err := i.client.GetObject(input)
 	if err != nil {
-		return nil, errors.Wrap(err, "storage.download")
+		return nil, nil, errors.Wrap(err, "storage.download")
 	}
 
-	return result.Body, nil
+	return result.Body, result.ContentType, nil
 }
 
 // Remove file from the cloud storage
