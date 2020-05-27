@@ -44,7 +44,7 @@ func (h *Handler) Resize(w http.ResponseWriter, r *http.Request) error {
 	width, _ := strconv.Atoi(r.FormValue("width"))
 
 	rid := uuid.New()
-	resizedItem, err := h.query.CreateResizedItem(r.Context(), repository.CreateResizedItemParams{
+	resizedItem, err := query.CreateResizedItem(r.Context(), repository.CreateResizedItemParams{
 		ID:     rid,
 		OID:    oid,
 		Name:   originalItem.Name,
