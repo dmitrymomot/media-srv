@@ -42,55 +42,99 @@ func TestQueries_CreateResizedItem(t *testing.T) {
 	defer db.Close()
 	CreateResizedItemMock(mock, arg, nil)
 
-	type fields struct {
-		db DBTX
-	}
-	type args struct {
-		ctx context.Context
-		arg CreateResizedItemParams
-	}
-	tt := struct {
-		name    string
-		fields  fields
-		args    args
-		want    ResizedItem
-		wantErr bool
-	}{"success", fields{db}, args{context.TODO(), arg}, item, false}
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateResizedItem(tt.args.ctx, tt.args.arg)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, tt.wantErr)
+		got, err := q.CreateResizedItem(context.TODO(), arg)
+		if err != nil {
+			t.Errorf("Queries.CreateResizedItem() error = %v", err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, tt.want)
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, item)
 		}
 	})
 
 	expErr := errors.New("CreateResizedItem")
 	CreateResizedItemMock(mock, arg, expErr)
-	tt = struct {
-		name    string
-		fields  fields
-		args    args
-		want    ResizedItem
-		wantErr bool
-	}{"error", fields{db}, args{context.TODO(), arg}, ResizedItem{}, true}
-	t.Run(tt.name, func(t *testing.T) {
+
+	t.Run("error", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateResizedItem(tt.args.ctx, tt.args.arg)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, tt.wantErr)
+		_, err := q.CreateResizedItem(context.TODO(), arg)
+		if err == nil {
+			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, expErr)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, tt.want)
+	})
+}
+
+func TestQueries_CreateResizedItem_WithTx(t *testing.T) {
+	createdAt, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
+	arg := CreateResizedItemParams{
+		ID:     uuid.New(),
+		OID:    uuid.New(),
+		Name:   "image.png",
+		Path:   "uploads/image.png",
+		URL:    "http://test/uploads/image.png",
+		Width:  100,
+		Height: 100,
+	}
+	item := ResizedItem{
+		ID:        arg.ID,
+		OID:       arg.OID,
+		Name:      arg.Name,
+		Path:      arg.Path,
+		URL:       arg.URL,
+		Width:     arg.Width,
+		Height:    arg.Height,
+		CreatedAt: createdAt,
+	}
+
+	db, mock, err := NewSQLMock()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	CreateResizedItemWithTxMock(mock, arg, nil)
+
+	t.Run("success", func(t *testing.T) {
+		q := &Queries{
+			db: db,
 		}
+		tx, _ := db.Begin()
+		qq := q.WithTx(tx)
+		got, err := qq.CreateResizedItem(context.TODO(), arg)
+		if err != nil {
+			tx.Rollback()
+			t.Errorf("Queries.CreateResizedItem() error = %v", err)
+			return
+		}
+		tx.Commit()
+
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateResizedItem() = %v, want %v", got, item)
+		}
+	})
+
+	expErr := errors.New("CreateResizedItem")
+	CreateResizedItemWithTxMock(mock, arg, expErr)
+
+	t.Run("error", func(t *testing.T) {
+		q := &Queries{
+			db: db,
+		}
+		tx, _ := db.Begin()
+		qq := q.WithTx(tx)
+		_, err := qq.CreateResizedItem(context.TODO(), arg)
+		if err == nil {
+			tx.Commit()
+			t.Errorf("Queries.CreateResizedItem() error = %v, wantErr %v", err, expErr)
+			return
+		}
+		tx.Rollback()
 	})
 }
 

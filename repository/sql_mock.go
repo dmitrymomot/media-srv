@@ -30,6 +30,26 @@ func CreateOriginalItemMock(mock sqlmock.Sqlmock, arg CreateOriginalItemParams, 
 	}
 }
 
+// CreateOriginalItemWithTxMock ...
+func CreateOriginalItemWithTxMock(mock sqlmock.Sqlmock, arg CreateOriginalItemParams, expectedErr error) {
+	mock.ExpectBegin()
+	if expectedErr != nil {
+		mock.ExpectExec(createOriginalItem).
+			WithArgs(arg.ID, arg.Name, arg.Path, arg.URL).
+			WillReturnError(expectedErr)
+		mock.ExpectRollback()
+	} else {
+		t, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
+		mock.ExpectQuery(createOriginalItem).
+			WithArgs(arg.ID, arg.Name, arg.Path, arg.URL).
+			WillReturnRows(
+				sqlmock.NewRows([]string{"id", "name", "path", "url", "created_at"}).
+					AddRow(arg.ID, arg.Name, arg.Path, arg.URL, t),
+			)
+		mock.ExpectCommit()
+	}
+}
+
 // GetOriginalItemByIDMock ...
 func GetOriginalItemByIDMock(mock sqlmock.Sqlmock, arg OriginalItem, expectedErr error) {
 	if expectedErr != nil {
@@ -69,6 +89,7 @@ func CreateResizedItemMock(mock sqlmock.Sqlmock, arg CreateResizedItemParams, ex
 		mock.ExpectExec(createResizedItem).
 			WithArgs(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height).
 			WillReturnError(expectedErr)
+
 	} else {
 		t, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
 		mock.ExpectQuery(createResizedItem).
@@ -77,6 +98,27 @@ func CreateResizedItemMock(mock sqlmock.Sqlmock, arg CreateResizedItemParams, ex
 				sqlmock.NewRows([]string{"id", "oid", "name", "path", "url", "width", "height", "created_at"}).
 					AddRow(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height, t),
 			)
+	}
+}
+
+// CreateResizedItemWithTxMock ...
+func CreateResizedItemWithTxMock(mock sqlmock.Sqlmock, arg CreateResizedItemParams, expectedErr error) {
+	mock.ExpectBegin()
+	if expectedErr != nil {
+		mock.ExpectExec(createResizedItem).
+			WithArgs(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height).
+			WillReturnError(expectedErr)
+		mock.ExpectRollback()
+
+	} else {
+		t, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
+		mock.ExpectQuery(createResizedItem).
+			WithArgs(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height).
+			WillReturnRows(
+				sqlmock.NewRows([]string{"id", "oid", "name", "path", "url", "width", "height", "created_at"}).
+					AddRow(arg.ID, arg.OID, arg.Name, arg.Path, arg.URL, arg.Width, arg.Height, t),
+			)
+		mock.ExpectCommit()
 	}
 }
 

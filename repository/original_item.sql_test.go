@@ -36,54 +36,91 @@ func TestQueries_CreateOriginalItem(t *testing.T) {
 	defer db.Close()
 	CreateOriginalItemMock(mock, arg, nil)
 
-	type fields struct {
-		db DBTX
-	}
-	type args struct {
-		ctx context.Context
-		arg CreateOriginalItemParams
-	}
-	tt := struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"success: create original", fields{db}, args{context.TODO(), arg}, item, false}
-
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("success: create original", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		got, err := q.CreateOriginalItem(tt.args.ctx, tt.args.arg)
+		got, err := q.CreateOriginalItem(context.TODO(), arg)
 		if err != nil {
-			t.Errorf("Queries.CreateOriginalItem() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("Queries.CreateOriginalItem() error = %v", err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("Queries.CreateOriginalItem() = %v, want %v", got, tt.want)
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateOriginalItem() = %v, want %v", got, item)
 		}
 	})
 
 	wantErr := errors.New("CreateOriginalItem")
 	CreateOriginalItemMock(mock, arg, wantErr)
-	tt = struct {
-		name    string
-		fields  fields
-		args    args
-		want    OriginalItem
-		wantErr bool
-	}{"error: create original", fields{db}, args{context.TODO(), arg}, item, true}
-
-	t.Run(tt.name, func(t *testing.T) {
+	t.Run("error: create original", func(t *testing.T) {
 		q := &Queries{
-			db: tt.fields.db,
+			db: db,
 		}
-		_, err := q.CreateOriginalItem(tt.args.ctx, tt.args.arg)
+		_, err := q.CreateOriginalItem(context.TODO(), arg)
 		if err == nil {
-			t.Errorf("Queries.CreateOriginalItem() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("Queries.CreateOriginalItem() error = %v, wanted = %v", err, wantErr)
 			return
 		}
+	})
+}
+
+func TestQueries_CreateOriginalItem_WithTx(t *testing.T) {
+	createdAt, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2006")
+	arg := CreateOriginalItemParams{
+		ID:   uuid.New(),
+		Name: "image.png",
+		Path: "uploads/image.png",
+		URL:  "http://test/uploads/image.png",
+	}
+	item := OriginalItem{
+		ID:        arg.ID,
+		Name:      arg.Name,
+		Path:      arg.Path,
+		URL:       arg.URL,
+		CreatedAt: createdAt,
+	}
+
+	db, mock, err := NewSQLMock()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	CreateOriginalItemWithTxMock(mock, arg, nil)
+
+	t.Run("success: create original", func(t *testing.T) {
+		q := &Queries{
+			db: db,
+		}
+		tx, _ := db.Begin()
+		qq := q.WithTx(tx)
+		got, err := qq.CreateOriginalItem(context.TODO(), arg)
+		if err != nil {
+			tx.Rollback()
+			t.Errorf("Queries.CreateOriginalItem() error = %v", err)
+			return
+		}
+		tx.Commit()
+
+		if !reflect.DeepEqual(got, item) {
+			t.Errorf("Queries.CreateOriginalItem() = %v, want %v", got, item)
+		}
+	})
+
+	wantErr := errors.New("CreateOriginalItem")
+	CreateOriginalItemWithTxMock(mock, arg, wantErr)
+	t.Run("error: create original", func(t *testing.T) {
+		q := &Queries{
+			db: db,
+		}
+		tx, _ := db.Begin()
+		qq := q.WithTx(tx)
+		_, err := qq.CreateOriginalItem(context.TODO(), arg)
+		if err == nil {
+			tx.Commit()
+			t.Errorf("Queries.CreateOriginalItem() error = %v, wanted = %v", err, wantErr)
+			return
+		}
+		tx.Rollback()
 	})
 }
 
