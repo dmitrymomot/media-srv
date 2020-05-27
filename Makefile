@@ -27,6 +27,11 @@ up: ## Deploy pods to kubernetes
 	&& sleep 10 \
 	&& docker-compose up -d api
 
-
 down: ## Down pods
 	@docker-compose down -v --rmi=local
+
+test: ## Run all tests
+	go test ./handler
+	go test ./repository
+	go test ./resizer
+	go test ./storage

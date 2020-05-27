@@ -29,16 +29,20 @@ func (s *S3Mock) GetObject(input *s3.GetObjectInput) (*s3.GetObjectOutput, error
 		return nil, s.Error
 	}
 
-	img, err := os.Open(s.Filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer img.Close()
+	if s.Filepath != "" {
+		img, err := os.Open(s.Filepath)
+		if err != nil {
+			return nil, err
+		}
+		defer img.Close()
 
-	return &s3.GetObjectOutput{
-		Body:        img,
-		ContentType: aws.String(s.ContentType),
-	}, nil
+		return &s3.GetObjectOutput{
+			Body:        img,
+			ContentType: aws.String(s.ContentType),
+		}, nil
+	}
+
+	return &s3.GetObjectOutput{}, nil
 }
 
 // DeleteObject ...
